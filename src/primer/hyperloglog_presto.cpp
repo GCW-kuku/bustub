@@ -17,10 +17,10 @@ namespace bustub {
 /** @brief Parameterized constructor. */
 template <typename KeyType>
 HyperLogLogPresto<KeyType>::HyperLogLogPresto(int16_t n_leading_bits) : cardinality_(0) {
-  n_bits_ = n_leading_bits;
   if (n_leading_bits < 0) {
     return;
   }
+  n_bits_ = n_leading_bits;
   dense_bucket_.resize(1 << n_leading_bits);
 }
 
@@ -69,9 +69,6 @@ auto HyperLogLogPresto<KeyType>::GetBucketValue(std::bitset<64> bset) -> int {
 template <typename T>
 auto HyperLogLogPresto<T>::ComputeCardinality() -> void {
   /** @TODO(student) Implement this function! */
-  if (n_bits_ < 0) {
-    return;
-  }
   double sum = 0;
   for (size_t i = 0; i < dense_bucket_.size(); i++) {
     auto low4 = dense_bucket_[i];
@@ -79,9 +76,11 @@ auto HyperLogLogPresto<T>::ComputeCardinality() -> void {
     auto value = (high3.to_ulong() << 4) | low4.to_ulong();
     sum += 1.0 / std::pow(2, value);
   }
-  auto m = dense_bucket_.size();
-  auto result = CONSTANT * m * m / sum;
-  cardinality_ = static_cast<size_t>(result);
+  if (sum != 0) {
+    auto m = dense_bucket_.size();
+    auto result = CONSTANT * m * m / sum;
+    cardinality_ = static_cast<size_t>(result);
+  }
 }
 
 template class HyperLogLogPresto<int64_t>;

@@ -17,10 +17,10 @@ namespace bustub {
 /** @brief Parameterized constructor. */
 template <typename KeyType>
 HyperLogLog<KeyType>::HyperLogLog(int16_t n_bits) : cardinality_(0) {
-  n_bits_ = n_bits;
   if (n_bits < 0) {
     return;
   }
+  n_bits_ = n_bits;
   buckets_.resize(1 << n_bits_, 0);
 }
 
@@ -75,16 +75,15 @@ auto HyperLogLog<KeyType>::AddElem(KeyType val) -> void {
 template <typename KeyType>
 auto HyperLogLog<KeyType>::ComputeCardinality() -> void {
   /** @TODO(student) Implement this function! */
-  if (n_bits_ < 0) {
-    return;
-  }
   double sum = 0;
   for (auto bucket : buckets_) {
     sum += 1.0 / std::pow(2, bucket);
   }
-  auto m = buckets_.size();
-  auto result = CONSTANT * m * m / sum;
-  cardinality_ = static_cast<size_t>(result);
+  if (sum != 0) {
+    auto m = buckets_.size();
+    auto result = CONSTANT * m * m / sum;
+    cardinality_ = static_cast<size_t>(result);
+  }
 }
 
 template <typename KeyType>
